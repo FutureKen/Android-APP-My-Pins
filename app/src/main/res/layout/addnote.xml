@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/captionarea"
+        android:hint="Type your caption here"
+        android:layout_weight="0.2"
+        android:padding="16dp"
+        android:maxLines="6"
+        android:textSize="22dp"
+        android:background="#e1e1e1" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.8" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Take Photo"
+            android:id="@+id/button"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:background="#334295"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save Note"
+            android:id="@+id/save"
+            android:layout_weight="1"
+            android:background="#0bac8c"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+
+</LinearLayout>

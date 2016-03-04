@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 
+
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
 
     SQLiteDatabase db;
@@ -44,8 +45,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         try {
             openDatabase(); // open (create if needed) database
-            dropTable();
-            insertSomeDbData(); // create-populate notes
 
         } catch (Exception e) {
             finish();
@@ -62,9 +61,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         noteCursor.moveToPosition(position);
 
         Bundle args = new Bundle();
+        args.putString("noteid", noteCursor.getString(noteCursor.getColumnIndex("_id")));
         args.putString("caption", noteCursor.getString(noteCursor.getColumnIndex("caption")));
         args.putString("path", noteCursor.getString(noteCursor.getColumnIndex("path")));
         args.putString("date", noteCursor.getString(noteCursor.getColumnIndex("date")));
+        args.putDouble("lat", noteCursor.getDouble(noteCursor.getColumnIndex("lat")));
+        args.putDouble("lng", noteCursor.getDouble(noteCursor.getColumnIndex("lng")));
 
         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
         intent.putExtras(args);
@@ -74,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void populateListView() {
         lv = (ListView) findViewById(R.id.listView);
-        noteCursor = db.rawQuery("SELECT recID as _id, caption, path, date FROM notes ORDER BY date DESC", null);
+        noteCursor = db.rawQuery("SELECT recID as _id, caption, path, date, lat, lng FROM notes ORDER BY date DESC", null);
         notesAdapter = new NotesCursorAdaptor(MainActivity.this, noteCursor, 1);
         lv.setAdapter(notesAdapter);
     }
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-    private void toast(String msg) {
+    public void toast(String msg) {
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
@@ -144,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             // create table
             db.execSQL("create table notes ("
                     + " recID integer PRIMARY KEY autoincrement, "
-                    + " caption text, " + " path text, " + " date text );   ");
+                    + " caption text, " + " path text, " + " date text, " + " lat text, " + " lng text );   ");
             // commit your changes
             db.setTransactionSuccessful();
 
@@ -160,10 +162,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         try {
 
             // insert rows
-            db.execSQL("insert into notes(caption, path, date) "
-                    + " values ('Today I ate a huge burger, really donot wanna eat anything else.', 'bigburger.jpg', '2015-10-07 14:23' );");
-            db.execSQL("insert into notes(caption, path, date) "
-                    + " values ('Golden Gate Bridge is so beautiful, wonderful view here!', 'goldenbridge.jpg', '2015-11-02 16:23' );");
+            db.execSQL("insert into notes(caption, path, date, lat, lng) "
+                    + " values ('Today I ate a huge burger, really donot wanna eat anything else.', 'bigburger.jpg', '2015-10-07 14:23', '37.421313', '-122.093666' );");
+            db.execSQL("insert into notes(caption, path, date, lat, lng) "
+                    + " values ('Golden Gate Bridge is so beautiful, wonderful view here!', 'goldenbridge.jpg', '2015-11-02 16:23', '37.808599', '-122.476001' );");
 
             // commit your changes
             db.setTransactionSuccessful();
@@ -188,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             finish();
         }
     }
-    public void useInsertMethod(String caption, String path, String date) {
+    public void useInsertMethod(String caption, String path, String date, String lat, String lng) {
         // an alternative to SQL "insert into table values(...)"
         // ContentValues is an Android dynamic row-like container
         try {
@@ -196,6 +198,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             initialValues.put("caption", caption);
             initialValues.put("path", path);
             initialValues.put("date", date);
+            initialValues.put("lat", lat);
+            initialValues.put("lng", lng);
 
             db.insert("notes", null, initialValues);
 
@@ -214,6 +218,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             e.commit();
             // If not, run these methods:
             SetDirectory();
+            try {
+                //openDatabase(); // open (create if needed) database
+                dropTable();
+                insertSomeDbData(); // create-populate notes
+
+            } catch (Exception d) {
+                finish();
+            }
+
 
         } else { // Otherwise start the application here:
             return;

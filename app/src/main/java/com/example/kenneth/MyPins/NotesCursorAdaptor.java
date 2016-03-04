@@ -44,6 +44,8 @@ public class NotesCursorAdaptor extends CursorAdapter {
             String img = cursor.getString(cursor.getColumnIndex("path"));
             String words = cursor.getString(cursor.getColumnIndex("caption"));
             String date = cursor.getString(cursor.getColumnIndex("date"));
+            String lat = cursor.getString(cursor.getColumnIndex("lat"));
+            String lng = cursor.getString(cursor.getColumnIndex("lng"));
             // Populate fields with extracted properties
 
             path.setText(words);

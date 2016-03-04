@@ -3,16 +3,25 @@ package com.example.kenneth.MyPins;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,22 +33,37 @@ import java.util.Date;
  * Created by Kenneth on 2/23/2016.
  */
 
-public class Addnote extends MainActivity implements View.OnClickListener {
+public class Addnote extends MainActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     final String albumName = "ken.mypins";
     String caption;
     String filename;
     String date;
     File imageFile;
-
+    GoogleApiClient mGoogleApiClient = null;
+    Location mLastLocation;
+    String lat;
+    String lng;
+    TextView textView1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.addnote);
 
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
         final EditText captiontxt = (EditText) findViewById(R.id.captionarea);
         Button button = (Button) findViewById(R.id.button);
         Button button1 = (Button) findViewById(R.id.save);
+        //textView1 = (TextView) findViewById(R.id.textView1);
+
         button.setOnClickListener(this);
 
         button1.setOnClickListener(new View.OnClickListener() {
@@ -47,7 +71,7 @@ public class Addnote extends MainActivity implements View.OnClickListener {
             public void onClick(View v) {
                 caption = captiontxt.getText().toString();
                 date = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date());
-                useInsertMethod(caption, filename, date);
+                useInsertMethod(caption, filename, date, lat, lng);
                 finish();
             }
         });
@@ -115,5 +139,40 @@ public class Addnote extends MainActivity implements View.OnClickListener {
             Log.e("ken", "Failed to create album directory.  Check permissions and storage.");
         }
         return file;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        toast("onConnected() is called");
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation == null) {
+            lat = "";
+            lng = "";
+        } else {
+            lat = String.format("%.4f", mLastLocation.getLatitude());
+            lng = String.format("%.4f", mLastLocation.getLongitude());
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        toast("onConnectionSuspended() is called : i=" + i);
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        toast("onConnectionFailed() is called");
     }
 }

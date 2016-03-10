@@ -41,10 +41,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirstRun();
 
         try {
             openDatabase(); // open (create if needed) database
+            FirstRun();
 
         } catch (Exception e) {
             finish();
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             SetDirectory();
             try {
                 //openDatabase(); // open (create if needed) database
-                dropTable();
+//                dropTable();
                 insertSomeDbData(); // create-populate notes
 
             } catch (Exception d) {
